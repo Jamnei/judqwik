@@ -2111,7 +2111,7 @@ function tlPossession(plays) {
 }
 const TL_ZOOMS = [["all","Whole"],[600,"10 min"],[300,"5 min"],[120,"2 min"]];
 const TL = { win: [0, 1], key: "", who: "", drag: false, lastSeek: 0 };
-function tlZoom() { return S.tlZoom || "all" }
+function tlZoom() { return S.tlZoom2 || 120 }
 function tlPlays() {
   const s = cur(); if (!s) return [];
   const cv = s.curVid;
@@ -2353,7 +2353,7 @@ function tlFlash(id) {
   document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("fs", !!document.fullscreenElement); tlCloseMenu(); setTimeout(() => renderTimeline(), 120) });
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-act]"); if (!b) return;
-    if (b.dataset.act === "tl-zoom") { S.tlZoom = b.dataset.z === "all" ? "all" : +b.dataset.z; save(); renderTimeline() }
+    if (b.dataset.act === "tl-zoom") { S.tlZoom2 = b.dataset.z === "all" ? "all" : +b.dataset.z; save(); renderTimeline() }
     else if (b.dataset.act === "tl-toggle") { tlShow(!!S.tlOff); save() }
     else if (b.dataset.act === "tl-prev") tlStep(-1);
     else if (b.dataset.act === "tl-next") tlStep(1);
