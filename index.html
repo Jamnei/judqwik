@@ -263,6 +263,53 @@ body.fs .tl{padding:6px 8px 8px;gap:4px}
 body.fs .transport{flex:none}
 body.fs .pbpcard{position:static;height:calc(100vh - 16px)}
 body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
+
+/* ----- shot chart ----- */
+:root{--zc-hot:rgba(76,198,133,.62);--zc-mid:rgba(231,181,90,.55);--zc-cold:rgba(240,130,104,.55);--zc-none:#1A2128}
+.zwrap{display:grid;grid-template-columns:minmax(260px,380px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.zwrap{grid-template-columns:1fr}}
+.zcourt{display:flex;flex-direction:column;gap:8px;min-width:0}
+.zchart{width:100%;height:auto;background:var(--sunk);border:1px solid var(--line);border-radius:10px}
+.zchart .zr{cursor:pointer;stroke:none}
+.zchart .zr:hover{filter:brightness(1.3)}
+.zchart .zlines path,.zchart .zlines line,.zchart .zlines circle{fill:none;stroke:#C9D2DA;stroke-width:1.4;opacity:.75}
+.zchart .zlines .base{stroke-width:3;opacity:1}
+.zchart text{fill:var(--ink);text-anchor:middle;font-family:var(--display)}
+.zchart .zn{font-size:19px;font-weight:700}
+.zchart .zn.sm{font-size:12px}
+.zchart .zn.md{font-size:16px}
+.zchart .zs{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.zchart .zp{font-size:11px;fill:var(--ink);opacity:.8}
+.zkey{display:flex;gap:6px 12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.zkey i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid var(--line)}
+.zside{display:flex;flex-direction:column;gap:6px;min-width:0}
+.zh4{margin:4px 0 6px;font:600 13px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.zsel{min-height:26px;padding:1px 6px;font-size:12px;max-width:190px}
+
+/* ----- zone pad ----- */
+.zpad{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;border-top:1px solid var(--line);padding-top:8px}
+@media (max-width:600px){.zpad{grid-template-columns:110px minmax(0,1fr)}}
+.zpcourt{width:100%;height:auto;max-height:170px;background:var(--panel);border-radius:8px;border:1px solid var(--line)}
+.zpcourt .zp{fill:var(--sunk);cursor:pointer}
+.zpcourt .zp:hover{fill:var(--heat-soft)}
+.zpcourt .zp.on{fill:var(--heat)}
+.zpcourt .zpl path,.zpcourt .zpl line,.zpcourt .zpl circle{fill:none;stroke:#8d99a5;stroke-width:2}
+.zpcourt .zpl .base{stroke-width:4;stroke:#C9D2DA}
+.zpcourt text{fill:var(--ink);font:700 30px var(--display);text-anchor:middle}
+.zpcourt text.sm{font-size:17px}
+.zpcourt text.on{fill:var(--heat-ink)}
+.zpinfo{display:flex;flex-direction:column;gap:6px;min-width:0}
+.zpshot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:700 16px var(--display)}
+.zpbtns{display:flex;gap:4px;flex-wrap:wrap}
+.zpb{min-width:36px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--raise);font:700 15px var(--display);color:var(--ink)}
+.zpb:hover:not(:disabled){border-color:var(--heat)}
+.zpb.on{background:var(--heat);border-color:var(--heat);color:var(--heat-ink)}
+.zpb.clr{color:var(--muted)}
+.zpb:disabled{opacity:.4;cursor:default}
+.zpauto{display:inline-flex;gap:6px;align-items:center;margin-right:auto}
+.zpauto input{min-height:0;width:16px;height:16px}
+body.fs .zpad{grid-template-columns:110px minmax(0,1fr);padding-top:6px}
+body.fs .zpcourt{max-height:120px}
 </style>
 </head>
 <body>
@@ -304,6 +351,7 @@ body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
             <select id="tlAct" title="Show only one kind of action"></select>
             <span class="tlzoom" id="tlZoom"></span></div>
           <div class="tlgrid" id="tlGrid"></div>
+          <div class="zpad" id="zPad" hidden></div>
           <div class="tlfoot"><span class="small"><span class="tlkey tm-white"></span><span class="tlkey tm-blue"></span><span class="tlkey tm-black"></span> box colour = the squad of the player who did it · <span class="tlkey ok"></span> made · <span class="tlkey no"></span> missed · click an action to replay it · right-click to edit it · drag the ruler to scrub</span></div>
         </div>
         <div class="transport">
@@ -460,6 +508,7 @@ body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
         <tr><td><span class="tier t-Red"></span> Red</td><td>say “red shot”, “bad shot” or “shot we didn’t want” to downgrade any shot. To change a grade afterwards, click the shot in the play-by-play: each click moves it Gold → Silver → Bronze → Red → no grade</td></tr>
         <tr><td>Threes</td><td>three, trey, from deep, 3 pointer. Add how it came: <b>catch and shoot</b>, on time on target, off the catch, off the pass, receive, rhythm (Silver) · <b>off the dribble</b>, pull up, step back (Bronze). A plain “three make” is booked ungraded</td></tr>
         <tr><td>Free throws</td><td>free throw make, free throw miss, 1 of 2, both, split</td></tr>
+        <tr><td>Shot zone</td><td>say <b>zone</b> and the letter or number, anywhere in the call: zone right / zone left (at the rim) · zone 1, 2, 3 (paint) · zone A, B, C (mid-range) · zone X, Y, Z (threes). “Lamine catch and shoot 3 make zone Z” · “Anthony 2 make zone right at the rim”. The zone sets 2 or 3 points; a call that disagrees is flagged.</td></tr>
       </tbody></table>
     </div>
     <div class="card">
@@ -674,7 +723,7 @@ body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
     "pullup elbow baseline fadeaway rebound board boards assist assists dime dimes helper dish dished feed steal steals stole takeaway block blocks blocked rejection swat " +
     "swatted stuffed turnover turnovers travel traveling travelled walked carry carried backcourt stripped fumble fumbled bobble bobbled intercepted telegraphed overthrown " +
     "charge charged tip tipped deflection deflected deflects pursuit hustle dive dove diving loose wallup verticality upcycle foul fouled reach hack personal gold silver " +
-    "bronze white black blue live dead rushed panic hurried free throw throws line read paint touch corner wing quarter half overtime").split(" "));
+    "zone zones rim bronze white black blue live dead rushed panic hurried free throw throws line read paint touch corner wing quarter half overtime").split(" "));
 
   const SHOT_TYPES = [
     { re: "catch and shoot|catch n shoot|catch shoot|c and s|spot up|spotup|on time and on target|on time on target|on time|on target|off the catch|off a catch|on the catch|off the pass|off a pass|on the receive|received|receives|receive|in rhythm|rhythm", type: "Catch & shoot 3", tier: "Silver", val: 3 },
@@ -799,17 +848,38 @@ body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
 
     // ---- shots ----
     let sType = null, tier = null, val = null;
+    // Dean Oliver's shot zones (Basketball on Paper): R/L at the rim, 1-3 in the paint, A-C mid-range, X-Z beyond the arc
+    let zone = null;
+    const ZPAT = [["R", "zone right|zone r|zone are|zone our|right zone|right side of the rim|right of the rim|right side of the hoop|right of the hoop|right of the basket"],
+      ["L", "zone left|zone l|zone el|left zone|left side of the rim|left of the rim|left side of the hoop|left of the hoop|left of the basket"],
+      ["1", "zone 1|zone won"], ["2", "zone 2|zone to|zone too"], ["3", "zone 3|zone tree|zone free"],
+      ["A", "zone a|zone ay|zone eh|zone hey"], ["B", "zone b|zone be|zone bee"], ["C", "zone c|zone see|zone sea|zone si"],
+      ["X", "zone x|zone ex|zone ax"], ["Y", "zone y|zone why|zone wye"], ["Z", "zone z|zone zed|zone zee|zone said"]];
+    for (const [z, re] of ZPAT) if (take(st, "(?:from |in |out of |at )?(?:" + re + ")")) { zone = z; break }
     for (const t of SHOT_TYPES) { if (take(st, t.re)) { if (!sType) { sType = t.type; tier = t.tier; val = t.val } } }
     if (offPass && !sType) { sType = "Catch & shoot 3"; tier = "Silver"; val = 3 }
     for (const [re, tName] of TIERS) if (take(st, re)) tier = tName;
-    if (take(st, "3 pointer|3 point|3 ball|3s|3|trey|triple|from deep|from downtown|from 3|deep ball|bomb")) {
+    const said3 = take(st, "3 pointer|3 point|3 ball|3s|3|trey|triple|from deep|from downtown|from 3|deep ball|bomb");
+    if (said3) {
       val = 3;
       if (sType && sType !== "Catch & shoot 3" && sType !== "Off-dribble 3") {
         if (sType === "Mid-range" && /pull ?up|step ?back|off (?:the |a )?dribble|off the bounce/.test(text)) { sType = "Off-dribble 3"; tier = tier === "Red" ? "Red" : "Bronze" }
         else { sType = null; if (tier === "Bronze" || tier === "Gold") tier = null }
       }
     }
-    if (take(st, "2 pointer|2 point|2|deuce")) { if (!val) val = 2 }
+    const said2 = take(st, "2 pointer|2 point|2|deuce"); if (said2 && !val) val = 2;
+    // the zone sets the value of the shot; a call that says otherwise is flagged
+    if (zone && !ft) {
+      const outside = "XYZ".includes(zone);
+      if (outside) {
+        if (said2 && !said3) warns.push(`Zone ${zone} is beyond the arc but the call says 2`);
+        else if (val !== 3) { val = 3; if (sType === "Mid-range") { sType = "Off-dribble 3"; tier = tier === "Red" ? "Red" : "Bronze" } else if (sType && !/ 3$/.test(sType)) { sType = null; if (tier === "Gold") tier = null } }
+      } else {
+        if (said3) warns.push(`Zone ${zone} is inside the arc but the call says 3`);
+        else if (val === 3) { val = 2; if (sType) sType = sType.replace(/ 3$/, ""); notes.push(`Booked as a two from Zone ${zone}`) }
+        else if (!val) val = 2;
+      }
+    }
     let made = null, andOne = false;
     if (take(st, "and 1|and one|plus 1|plus the foul")) { made = true; andOne = true }
     // blocked: a miss for a shooter, a block otherwise
@@ -831,7 +901,7 @@ body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
       if (made === null) warns.push("Shot: say make or miss");
       else {
         if (!val) { val = 2; if (!sType) notes.push("Booked as a two") }
-        add(val === 3 ? (made ? "3M" : "3X") : (made ? "2M" : "2X"), { tier: tier || null, stype: sType || null });
+        add(val === 3 ? (made ? "3M" : "3X") : (made ? "2M" : "2X"), { tier: tier || null, stype: sType || null, zone: zone || null });
         if (!tier) notes.push("Shot not graded");
       }
       if (andOne) notes.push("And-one: call the free throw separately");
@@ -988,6 +1058,12 @@ const CLIPS = ["C1","C2","C3","C4","C5","C6"];
 const PERIOD_ORDER = ["Q1","H1","Q2","Q3","H2","Q4","OT"].concat(CLIPS);
 const VLABELS = ["Full game","1st half","2nd half","Q1 + Q2","Q3 + Q4","Q1","Q2","Q3","Q4","OT","Clip 1","Clip 2","Clip 3","Clip 4","Clip 5","Clip 6","Segment"];
 const LABEL_PERIOD = { "Q1": "Q1", "Q2": "Q2", "Q3": "Q3", "Q4": "Q4", "OT": "OT", "1st half": "H1", "2nd half": "H2", "Clip 1": "C1", "Clip 2": "C2", "Clip 3": "C3", "Clip 4": "C4", "Clip 5": "C5", "Clip 6": "C6" };
+const ZONES = { R: "Right of the rim", L: "Left of the rim", "1": "Paint 1", "2": "Paint 2", "3": "Paint 3", A: "Mid-range A", B: "Mid-range B", C: "Mid-range C", X: "Three X", Y: "Three Y", Z: "Three Z" };
+const ZORDER = ["R", "L", "1", "2", "3", "A", "B", "C", "X", "Y", "Z"];
+const ZGROUPS = [["Rim", ["R", "L"]], ["Paint", ["1", "2", "3"]], ["Mid-range", ["A", "B", "C"]], ["Three", ["X", "Y", "Z"]]];
+const zoneOut = z => "XYZ".includes(z);
+// a zone fixes whether the shot is worth 2 or 3
+function fitZone(it) { if (!it.zone || !/^[23][MX]$/.test(it.k)) return false; const want = zoneOut(it.zone) ? "3" : "2"; if (it.k[0] === want) return false; it.k = want + it.k[1]; if (it.stype) it.stype = want === "2" ? it.stype.replace(/ 3$/, "") : it.stype; return true }
 const KNAME = { "2M":"2PT make","2X":"2PT miss","3M":"3PT make","3X":"3PT miss","FM":"FT make","FX":"FT miss","OR":"Off. rebound","DR":"Def. rebound","AS":"Assist","ST":"Steal","BK":"Block","TO":"Turnover","PF":"Foul","CH":"Charge","TP":"Tip","PU":"Pursuit","YO":"YOU","WU":"WallUp","P6":"Paint touch in 6","PT":"Paint touch","RR":"Right read","UP":"Upcycle" };
 const KCLS = { "2M":"mk","3M":"mk","FM":"mk","2X":"ms","3X":"ms","FX":"ms","CH":"hv","TP":"hv","PU":"hv","YO":"hv","WU":"hv","P6":"hv","PT":"hv","RR":"hv","UP":"hv","TO":"to" };
 
@@ -1311,6 +1387,7 @@ function itemTag(it, showName = true) {
   const tier = it.tier ? `<span class="tier t-${it.tier}" title="${esc(it.tier)}"></span>` : "";
   let extra = [];
   if (it.stype) extra.push(it.stype);
+  if (it.zone) extra.push("Zone " + it.zone);
   if (it.k === "TO") { if (it.toType) extra.push(it.toType); if (it.ball) extra.push(it.ball) }
   return `<span class="tag ${KCLS[it.k] || ""}">${tier}${showName ? `<span class="pn">${esc(it.p ? short(it.p) : "?")}</span>` : ""}<span class="st">${esc(KNAME[it.k] || it.k)}${extra.length ? " · " + esc(extra.join(" · ")) : ""}</span></span>`;
 }
@@ -1356,6 +1433,7 @@ function renderPBP() {
         ${p.warns.length ? `<div class="warn">${esc(p.warns.join(" · "))}</div>` : ""}
         ${(() => { const s0 = cur(); if (!s0 || s0.type !== "Scrimmage" || viewOnly() || p.squad) return ""; const need = [...new Set(p.items.map(i => i.p).filter(n => n && !(s0.squadOf || {})[n]))]; return need.map(n => `<div class="row" style="gap:4px"><span class="warn" style="font-size:12px">${esc(short(n))} has no squad:</span>${S.squads.map(q => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="set-squad" data-p="${esc(n)}" data-q="${esc(q)}"><span class="sw" style="background:${sqColor(q)}"></span> ${esc(q)}</button>`).join("")}</div>`).join("") })()}
         ${viewOnly() ? "" : p.items.map((i, ix) => i.k !== "TO" || (i.toType && i.ball) ? "" : `<div class="row" style="gap:4px">${!i.toType ? `<span class="warn" style="font-size:12px">Turnover type:</span>${["Passing", "Handling", "Violation", "Rushed"].map(t => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="to-set" data-id="${p.id}" data-i="${ix}" data-f="toType" data-v="${t}">${t}</button>`).join("")}` : ""}${!i.ball ? `<span class="warn" style="font-size:12px">${i.toType ? "Ball:" : "·"}</span>${["Live", "Dead"].map(t => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="to-set" data-id="${p.id}" data-i="${ix}" data-f="ball" data-v="${t}">${t}</button>`).join("")}` : ""}</div>`).join("")}
+        ${viewOnly() ? "" : p.items.map((i, ix) => /^[23][MX]$/.test(i.k) ? `<div class="row" style="gap:4px"><span class="small" style="font-size:12px">Zone</span><select class="zsel" data-act="zone-set" data-id="${p.id}" data-i="${ix}" title="Dean Oliver shot zone"><option value="">–</option>${ZORDER.map(z => `<option value="${z}" ${i.zone === z ? "selected" : ""}>${z} · ${ZONES[z]}</option>`).join("")}</select></div>` : "").join("")}
         ${unresolved && !viewOnly() ? `<div class="row"><span class="small">Give it to</span><select data-act="assign" data-id="${p.id}"><option value="">Choose player</option>${S.roster.filter(r => r.name).map(r => `<option>${esc(r.name)}</option>`).join("")}</select></div>` : ""}
         <div class="tx">“${esc(p.text)}”${p.tlEdited ? ` <span class="warn" style="font-size:12px;font-style:normal">· corrected on the timeline</span>` : ""}</div></div>
       <div class="acts" ${viewOnly() ? "hidden" : ""}><button class="ib" data-act="edit" data-id="${p.id}" title="Edit">Edit</button><button class="ib ${armed === p.id ? "armed" : ""}" data-act="del" data-id="${p.id}" title="Delete">${armed === p.id ? "Delete" : "✕"}</button></div>
@@ -1529,6 +1607,17 @@ function writeSummary(T) {
     if (t.ga) q += `. Gold shots went ${t.gm} for ${t.ga}`;
     P.push(q + ".");
   }
+  // shot zones
+  { const zs = itemsInView().filter(x => isShot(x.it) && x.it.zone);
+    if (zs.length >= 3) {
+      const g = ZGROUPS.map(([n, zz]) => { const a = zs.filter(x => zz.includes(x.it.zone)); return [n, a.filter(x => isMake(x.it)).length, a.length] }).filter(x => x[2]);
+      const z1 = ZORDER.map(z => { const a = zs.filter(x => x.it.zone === z); return [z, a.filter(x => isMake(x.it)).length, a.length] }).filter(x => x[2] >= 2).sort((a, b) => (b[1] / b[2]) - (a[1] / a[2]) || b[2] - a[2]);
+      let zt = `By zone: ${listJoin(g.map(([n, m, a]) => `${n === "Three" ? "threes" : n.toLowerCase()} ${m} of ${a}`))}`;
+      if (z1.length) zt += `. The best spot was Zone ${z1[0][0]} (${z1[0][1]} of ${z1[0][2]})`;
+      if (z1.length > 1 && z1[z1.length - 1][1] / z1[z1.length - 1][2] < 0.34) zt += `; Zone ${z1[z1.length - 1][0]} went ${z1[z1.length - 1][1]} of ${z1[z1.length - 1][2]}`;
+      P.push(zt + ".");
+    }
+  }
   // turnovers
   if (t.to) {
     const types = [["passing", t.pa], ["ball handling", t.ha], ["violations", t.vi], ["rushed decisions", t.ru]].filter(x => x[1]).sort((a, b) => b[1] - a[1]);
@@ -1539,6 +1628,61 @@ function writeSummary(T) {
     P.push(tt.charAt(0).toUpperCase() + tt.slice(1) + ".");
   }
   return P.map(x => `<p>${x}</p>`).join("");
+}
+
+/* ---------- shot chart (Dean Oliver zones) ---------- */
+let chartWho = "";
+function shotChartSection() {
+  const all = itemsInView().filter(x => isShot(x.it));
+  if (!all.length) return "";
+  const players = [...new Set(all.map(x => x.it.p).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  if (chartWho && !players.includes(chartWho)) chartWho = "";
+  const who = it => !chartWho || it.p === chartWho;
+  const xs = all.filter(x => who(x.it));
+  const pts = a => a.reduce((s2, x) => s2 + (x.it.k === "3M" ? 3 : x.it.k === "2M" ? 2 : 0), 0);
+  const stat = zs => { const a = xs.filter(x => zs.includes(x.it.zone)); return { a: a.length, m: a.filter(x => isMake(x.it)).length, pts: pts(a) } };
+  const Z = {}; ZORDER.forEach(z => Z[z] = stat([z]));
+  const zoned = xs.filter(x => x.it.zone).length, none = xs.length - zoned;
+  const fill = st => !st.a ? "var(--zc-none)" : st.pts / st.a >= 1.2 ? "var(--zc-hot)" : st.pts / st.a >= 0.9 ? "var(--zc-mid)" : "var(--zc-cold)";
+  // court: baseline on the left, as in Basketball on Paper. Two rays from the rim through the corners of the lane split each band in three.
+  const top = "44,220 400,57 400,0 0,0 0,220", mid = "44,220 400,57 400,383", bot = "44,220 400,383 400,440 0,440 0,220";
+  const arc = "M20,30 L44,30 A190,190 0 0 1 44,410 L20,410 Z";
+  const reg = (z, clip, shape) => `<g clip-path="url(#zc-${clip})"><path class="zr" data-zclick="${z}" d="${shape}" fill="${fill(Z[z])}"><title>Zone ${z} · ${ZONES[z]} · ${Z[z].m} of ${Z[z].a}</title></path></g>`;
+  const court = "M0,0 H400 V440 H0 Z", lane = "M20,156 H184 V284 H20 Z";
+  // size 0: letter, made/att and % · 1: letter only (R, L) · 2: letter and made/att on one line (narrow paint zones)
+  const lab = (z, x, y, size) => { const st = Z[z]; const ma = st.a ? st.m + "/" + st.a : "–";
+    if (size === 1) return `<text x="${x}" y="${y}" class="zn sm" pointer-events="none">${z}</text>`;
+    if (size === 2) return `<text x="${x}" y="${y}" class="zn md" pointer-events="none">${z}<tspan class="zs" dx="5">${ma}</tspan></text>`;
+    return `<g class="zl" pointer-events="none"><text x="${x}" y="${y}" class="zn">${z}</text><text x="${x}" y="${y + 17}" class="zs">${ma}</text>${st.a ? `<text x="${x}" y="${y + 31}" class="zp">${Math.round(st.m / st.a * 100)}%</text>` : ""}</g>` };
+  const svg = `<svg class="zchart" viewBox="0 0 400 440" role="img" aria-label="Shot chart by zone">
+    <defs><clipPath id="zc-t"><polygon points="${top}"/></clipPath><clipPath id="zc-m"><polygon points="${mid}"/></clipPath><clipPath id="zc-b"><polygon points="${bot}"/></clipPath></defs>
+    ${reg("Z", "t", court)}${reg("Y", "m", court)}${reg("X", "b", court)}
+    ${reg("C", "t", arc)}${reg("B", "m", arc)}${reg("A", "b", arc)}
+    ${reg("3", "t", lane)}${reg("2", "m", lane)}${reg("1", "b", lane)}
+    <path class="zr" data-zclick="R" d="M20,196 H56 V220 H20 Z" fill="${fill(Z.R)}"><title>Zone R · right of the rim · ${Z.R.m} of ${Z.R.a}</title></path>
+    <path class="zr" data-zclick="L" d="M20,220 H56 V244 H20 Z" fill="${fill(Z.L)}"><title>Zone L · left of the rim · ${Z.L.m} of ${Z.L.a}</title></path>
+    <g class="zlines" pointer-events="none"><path d="${arc}"/><path d="${lane}"/><path d="M20,196 H56 V244 H20 Z"/><line x1="44" y1="220" x2="400" y2="57"/><line x1="44" y1="220" x2="400" y2="383"/><circle cx="184" cy="220" r="44" stroke-dasharray="4 4"/><line x1="20" y1="0" x2="20" y2="440" class="base"/><line x1="32" y1="202" x2="32" y2="238" class="base"/><circle cx="44" cy="220" r="7"/></g>
+    ${lab("Z", 290, 60)}${lab("Y", 330, 206)}${lab("X", 290, 370)}${lab("C", 130, 80)}${lab("B", 212, 206)}${lab("A", 130, 350)}${lab("3", 118, 180, 2)}${lab("2", 150, 226, 2)}${lab("1", 118, 278, 2)}${lab("R", 38, 213, 1)}${lab("L", 38, 238, 1)}
+  </svg>`;
+  const f = zs => xf(it => isShot(it) && zs.includes(it.zone) && who(it));
+  const fm = zs => xf(it => isShot(it) && zs.includes(it.zone) && who(it) && isMake(it));
+  const row = (label, zs, st, cls, zc) => `<tr class="${cls || ""}"><td class="l">${label}</td>${cell(st.a, "", `data-clip="${f(zs)}" data-all="1" ${zc ? `data-zc="${zc}"` : ""}`)}${cell(st.m, "", `data-clip="${fm(zs)}" data-all="1"`)}${cell(pct(st.m, st.a))}${cell(st.pts)}${cell(st.a ? (st.pts / st.a).toFixed(2) : "–", "hl")}${cell(zoned ? Math.round(st.a / zoned * 100) + "%" : "–")}</tr>`;
+  let t = `<div class="tbl"><table id="tbl-zones"><thead><tr><th class="l">Zone</th><th>Att</th><th>Made</th><th>FG%</th><th>Pts</th><th>Pts / shot</th><th>Share</th></tr></thead><tbody>`;
+  ZGROUPS.forEach(([g, zs]) => { t += zs.map(z => row(`<b>${z}</b> · ${esc(ZONES[z])}`, [z], Z[z], "", z)).join("") + row(`${g} total`, zs, stat(zs), "sq") });
+  t += row("All zoned shots", ZORDER, stat(ZORDER), "tot") + `</tbody></table></div>`;
+  // by player: made-attempted in each band
+  const byP = (chartWho ? [chartWho] : players).map(n => { const ys = all.filter(x => x.it.p === n);
+    const g = zs => { const a = ys.filter(x => zs.includes(x.it.zone)); return [a.filter(x => isMake(x.it)).length, a.length] };
+    const best = ZORDER.map(z => [z, ...g([z])]).filter(x => x[2]).sort((a, b) => b[2] - a[2])[0];
+    return `<tr><td class="l">${esc(n)}</td>${ZGROUPS.map(([, zs]) => { const [m, a] = g(zs); return cell(a ? m + "–" + a : "–", "", a ? `data-clip="${xf(it => isShot(it) && it.p === n && zs.includes(it.zone))}" data-all="1"` : "") }).join("")}${cell(best ? best[0] : "–")}${cell(ys.filter(x => !x.it.zone).length || "–")}</tr>` }).join("");
+  const pt = `<div class="tbl"><table id="tbl-zplayers"><thead><tr><th class="l">Player</th>${ZGROUPS.map(([g]) => `<th>${g}</th>`).join("")}<th>Most used</th><th>No zone</th></tr></thead><tbody>${byP}</tbody></table></div>`;
+  return `<section class="tsec" id="shotChart"><div class="row between"><h3>Shot chart${chartWho ? " · " + esc(chartWho) : ""}${sqFilter !== "All" ? " · " + esc(sqFilter) : ""}</h3>
+      <div class="row"><select id="chartWho" title="Show one player"><option value="">All players</option>${players.map(n => `<option ${n === chartWho ? "selected" : ""}>${esc(n)}</option>`).join("")}</select><button class="btn ghost" data-act="copy-table" data-t="zones" style="min-height:32px">Copy</button></div></div>
+    ${zoned ? "" : `<div class="banner">No shots have a zone yet. Add one to a call (“Lamine catch and shoot 3 make zone Z”) or pick it under the shot in the play-by-play.</div>`}
+    <div class="zwrap"><div class="zcourt">${svg}<div class="zkey"><span><i style="background:var(--zc-hot)"></i>1.2+ pts / shot</span><span><i style="background:var(--zc-mid)"></i>0.9–1.2</span><span><i style="background:var(--zc-cold)"></i>under 0.9</span><span><i style="background:var(--zc-none)"></i>no shots</span></div></div>
+      <div class="zside">${t}${none ? `<div class="small">${none} shot${none === 1 ? "" : "s"} without a zone ${none === 1 ? "is" : "are"} left out of the chart.</div>` : ""}</div></div>
+    <div><h4 class="zh4">By player</h4>${pt}</div>
+    <div class="small">Zones from Dean Oliver, <i>Basketball on Paper</i>. R and L are either side of the rim; 1, 2 and 3 are the paint; A, B and C are mid-range inside the arc; X, Y and Z are threes. Click a zone or any number to list and replay those shots.</div></section>`;
 }
 
 /* ---------- shot and turnover breakdowns ---------- */
@@ -1607,6 +1751,7 @@ function renderTally() {
   const summary = writeSummary(T);
   let out = summary ? `<section class="summary" id="sumBox"><div class="row between"><h3 style="margin:0;font:700 18px var(--display);letter-spacing:.06em;text-transform:uppercase">Session summary${sqFilter !== "All" ? " · " + esc(sqFilter) : ""}</h3><button class="btn ghost" data-act="copy-summary" style="min-height:32px">Copy</button></div>${summary}<span class="small">Click any underlined number in the tables below to list and replay the plays behind it.</span></section>` : "";
   out += squadCompare(T);
+  out += shotChartSection();
   out += SECTIONS.map(([key, title]) => {
     const cols = COLS[key], fs = CLIPF[key];
     const rowCells = (L, whoAttr) => cols.map((c, ci) => cell(c[1](L), c[2], fs[ci] ? `data-clip="${key}:${ci}" ${whoAttr}` : "")).join("");
@@ -1673,9 +1818,9 @@ async function download(name, text, type) {
 }
 function playsCSV() {
   const s = cur(); const vids = Object.fromEntries((s.videos || []).map(v => [v.id, v.label]));
-  const rows = [["Session","Video","Period","Video time","Seconds","Squad","Player","Stat","Shot type","Tier","Turnover type","Live/Dead","Call"]];
+  const rows = [["Session","Video","Period","Video time","Seconds","Squad","Player","Stat","Shot type","Tier","Zone","Turnover type","Live/Dead","Call"]];
   for (const p of s.plays.slice().sort((a, b) => a.ts - b.ts)) for (const it of p.items)
-    rows.push([s.name, vids[p.vid] || (p.vid === "local" ? "File" : ""), p.period, fmtT(p.t), p.t, itemSquad(p, it) || "", it.p || "", KNAME[it.k] || it.k, it.stype || "", it.tier || "", it.toType || "", it.ball || "", p.text]);
+    rows.push([s.name, vids[p.vid] || (p.vid === "local" ? "File" : ""), p.period, fmtT(p.t), p.t, itemSquad(p, it) || "", it.p || "", KNAME[it.k] || it.k, it.stype || "", it.tier || "", it.zone || "", it.toType || "", it.ball || "", p.text]);
   return rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(",")).join("\n");
 }
 
@@ -1838,7 +1983,7 @@ function sample() {
 function packSession(x) {
   return { name: x.name, date: x.date, type: x.type, opponent: x.opponent || "", period: x.period || "Q1", pset: x.pset || undefined,
     videos: (x.videos || []).map(v => ({ id: v.id, label: v.label, url: v.url })), squadOf: x.squadOf || {},
-    plays: x.plays.slice().sort((a, b) => a.ts - b.ts).map(p => [p.t, p.period || "", p.vid || "", p.squad || "", p.text || "", p.items.map(i => { const o = { k: i.k }; for (const f of ["p", "tier", "stype", "toType", "ball", "detail"]) if (i[f]) o[f] = i[f]; return o })]) };
+    plays: x.plays.slice().sort((a, b) => a.ts - b.ts).map(p => [p.t, p.period || "", p.vid || "", p.squad || "", p.text || "", p.items.map(i => { const o = { k: i.k }; for (const f of ["p", "tier", "stype", "zone", "toType", "ball", "detail"]) if (i[f]) o[f] = i[f]; return o })]) };
 }
 function unpackSession(o, extra) {
   const base = Date.now();
@@ -1846,7 +1991,7 @@ function unpackSession(o, extra) {
     videos: Array.isArray(o.videos) ? o.videos.filter(v => v && ytId(v.url)).map(v => ({ id: String(v.id || uid("v")), label: VLABELS.includes(v.label) ? v.label : "Segment", url: String(v.url) })) : [],
     squadOf: (o.squadOf && typeof o.squadOf === "object") ? o.squadOf : {},
     plays: (Array.isArray(o.plays) ? o.plays : []).map((a, i) => ({ id: uid("p"), t: +a[0] || 0, period: String(a[1] || ""), vid: a[2] || null, squad: a[3] || null, text: String(a[4] || ""),
-      items: (Array.isArray(a[5]) ? a[5] : []).filter(it => it && KNAME[it.k]).map(it => ({ k: it.k, p: it.p ? String(it.p) : null, tier: it.tier || null, stype: it.stype || null, toType: it.toType || null, ball: it.ball || null, detail: it.detail || null })),
+      items: (Array.isArray(a[5]) ? a[5] : []).filter(it => it && KNAME[it.k]).map(it => ({ k: it.k, p: it.p ? String(it.p) : null, tier: it.tier || null, stype: it.stype || null, zone: it.zone && ZONES[it.zone] ? it.zone : null, toType: it.toType || null, ball: it.ball || null, detail: it.detail || null })),
       notes: [], warns: [], ts: base + i, src: "shared" })) }, extra || {});
 }
 function b64u(bytes) { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") }
@@ -2169,7 +2314,7 @@ function renderTimeline() {
   const place = list => {
     const ends = [-1e9, -1e9];
     return list.map(m => {
-      const x = (m.p.t - a) / len * W; const txt = TL_SHORT[m.it.k] + (m.it.p ? " " + (ini[m.it.p] || "") : "");
+      const x = (m.p.t - a) / len * W; const txt = TL_SHORT[m.it.k] + (m.it.p ? " " + (ini[m.it.p] || "") : "") + (m.it.zone ? " ·" + m.it.zone : "");
       const w = txt.length * 6.2 + 10;
       let tier = ends.findIndex(e => x - w / 2 > e + 2), dot = false;
       if (tier < 0) { tier = ends[0] <= ends[1] ? 0 : 1; dot = true }
@@ -2203,6 +2348,7 @@ function renderTimeline() {
   $("tlPrev").textContent = "◀ Prev" + nm; $("tlNext").textContent = "Next" + nm + " ▶";
   TL.key = tlZoom() + "|" + a + "|" + b + "|" + plays.length + "|" + (s.curVid || "");
   updateTimeline(true);
+  renderZonePad();
 }
 function updateTimeline(force) {
   const ph = $("tlPh"), grid = $("tlGrid"); if (!ph || !grid) return;
@@ -2228,19 +2374,21 @@ function tlFindPlay(id) { const s = cur(); return s && s.plays.find(p => p.id ==
 // action filter: what the coach wants to see and step through
 const TL_FILTERS = [
   ["", [["all", "All actions"]]],
-  ["Scoring", [["shots", "All shots"], ["made", "Made shots"], ["miss", "Missed shots"], ["two", "2PT shots"], ["three", "3PT shots"], ["ft", "Free throws"]]],
+  ["Scoring", [["shots", "All shots"], ["nozone", "Shots without a zone"], ["made", "Made shots"], ["miss", "Missed shots"], ["two", "2PT shots"], ["three", "3PT shots"], ["ft", "Free throws"]]],
+  ["Shot zones", [["zrim", "Rim (R, L)"], ["zpaint", "Paint (1, 2, 3)"], ["zmid", "Mid-range (A, B, C)"], ["zthree", "Threes (X, Y, Z)"], ...ZORDER.map(z => ["z_" + z, "Zone " + z + " · " + ZONES[z]])]],
   ["Offence", [["ohvp", "Offensive HVP"], ["ast", "Assists"], ["to", "Turnovers"], ["oreb", "Offensive rebounds"], ["paint", "Paint touches (P6 + PT)"], ["rr", "Right reads"], ["up", "Upcycles"]]],
   ["Defence", [["dhvp", "Defensive HVP"], ["stl", "Steals"], ["dreb", "Defensive rebounds"], ["blk", "Blocks"], ["chg", "Charges"], ["tip", "Tips / deflections"], ["purs", "Ball pursuit"], ["you", "YOU"], ["wall", "WallUps"], ["foul", "Fouls"]]],
 ];
 const TL_FCODES = { shots: ["2M","3M","FM","2X","3X","FX"], made: ["2M","3M","FM"], miss: ["2X","3X","FX"], two: ["2M","2X"], three: ["3M","3X"], ft: ["FM","FX"],
   ohvp: ["P6","OR","PT","RR","UP"], ast: ["AS"], to: ["TO"], oreb: ["OR"], paint: ["P6","PT"], rr: ["RR"], up: ["UP"],
   dhvp: ["ST","CH","TP","PU","YO","BK","WU"], stl: ["ST"], dreb: ["DR"], blk: ["BK"], chg: ["CH"], tip: ["TP"], purs: ["PU"], you: ["YO"], wall: ["WU"], foul: ["PF"] };
-const TL_FSHORT = { shots: "shot", made: "make", miss: "miss", two: "2PT", three: "3PT", ft: "FT", ohvp: "off. HVP", ast: "AST", to: "TO", oreb: "OR", paint: "paint touch", rr: "RR", up: "UP",
+const TL_FSHORT = { nozone: "unzoned shot", shots: "shot", made: "make", miss: "miss", two: "2PT", three: "3PT", ft: "FT", ohvp: "off. HVP", ast: "AST", to: "TO", oreb: "OR", paint: "paint touch", rr: "RR", up: "UP",
   dhvp: "def. HVP", stl: "STL", dreb: "DR", blk: "BLK", chg: "charge", tip: "tip", purs: "pursuit", you: "YOU", wall: "WallUp", foul: "foul" };
 TL.act = "all";
-function tlMatch(it) { return TL.act === "all" || (TL_FCODES[TL.act] || []).includes(it.k) }
+const TL_FZONE = { zrim: ["R", "L"], zpaint: ["1", "2", "3"], zmid: ["A", "B", "C"], zthree: ["X", "Y", "Z"] }; ZORDER.forEach(z => TL_FZONE["z_" + z] = [z]);
+function tlMatch(it) { if (TL.act === "nozone") return /^[23][MX]$/.test(it.k) && !it.zone; if (TL_FZONE[TL.act]) return /^[23][MX]$/.test(it.k) && TL_FZONE[TL.act].includes(it.zone); return TL.act === "all" || (TL_FCODES[TL.act] || []).includes(it.k) }
 function tlActLabel() { for (const g of TL_FILTERS) for (const f of g[1]) if (f[0] === TL.act) return f[1].toLowerCase(); return "actions" }
-function tlActShort() { return TL_FSHORT[TL.act] || "" }
+function tlActShort() { return TL_FSHORT[TL.act] || (TL_FZONE[TL.act] ? (TL.act.startsWith("z_") ? "Zone " + TL.act.slice(2) : { zrim: "rim", zpaint: "paint", zmid: "mid", zthree: "three" }[TL.act]) : "") }
 function tlActPlays() { return tlPlays().filter(p => p.items.some(it => tlMatch(it) && (!TL.who || it.p === TL.who))) }
 function tlStep(dir) {
   const plays = tlActPlays();
@@ -2249,9 +2397,67 @@ function tlStep(dir) {
   const here = now() + S.leadIn;
   const base = TL.lastT != null && Math.abs(here - TL.lastT) < S.leadIn + 15 ? TL.lastT : here;
   const p = dir > 0 ? plays.find(x => x.t > base + 0.5) : plays.slice().reverse().find(x => x.t < base - 0.5);
-  if (p) { TL.lastT = p.t; jump(p); tlFlash(p.id); const i = plays.indexOf(p) + 1; toast(`${fmtT(p.t)} · ${i} of ${plays.length} ${tlActLabel()}`) }
+  if (p) { TL.lastT = p.t; TL.cur = { id: p.id, ix: p.items.findIndex(it => tlMatch(it) && (!TL.who || it.p === TL.who)) }; jump(p); tlFlash(p.id); renderZonePad(); const i = plays.indexOf(p) + 1; toast(`${fmtT(p.t)} · ${i} of ${plays.length} ${tlActLabel()}`) }
   else toast(dir > 0 ? `That's the last of the ${tlActLabel()} on this video.` : `That's the first of the ${tlActLabel()} on this video.`);
 }
+// zone pad: shown while the timeline is filtered to shots. It tags the current shot with one click and can move on to the next.
+const ZPAD_FILTERS = ["shots", "nozone", "made", "miss", "two", "three", "zrim", "zpaint", "zmid", "zthree"];
+TL.zAuto = true;
+function zpadOn() { return ZPAD_FILTERS.includes(TL.act) || String(TL.act).startsWith("z_") }
+function zpadCurrent() {
+  const s = cur(); if (!s) return null;
+  const isSh = it => /^[23][MX]$/.test(it.k);
+  if (TL.cur) { const p = tlFindPlay(TL.cur.id); const it = p && p.items[TL.cur.ix]; if (p && it && isSh(it)) return { p, ix: TL.cur.ix, it } }
+  // otherwise the shot nearest the film, among the shots in view
+  const plays = tlPlays().filter(p => p.items.some(it => isSh(it) && (tlMatch(it) || TL.act === "nozone") && (!TL.who || it.p === TL.who)));
+  if (!plays.length) return null;
+  const t = now() + S.leadIn;
+  const p = plays.slice().reverse().find(x => x.t <= t + 1) || plays[0];
+  const ix = p.items.findIndex(it => isSh(it) && (!TL.who || it.p === TL.who));
+  return ix < 0 ? null : { p, ix, it: p.items[ix] };
+}
+function zpadCourt(sel) {
+  const top = "44,220 400,57 400,0 0,0 0,220", mid = "44,220 400,57 400,383", bot = "44,220 400,383 400,440 0,440 0,220";
+  const arc = "M20,30 L44,30 A190,190 0 0 1 44,410 L20,410 Z", court = "M0,0 H400 V440 H0 Z", lane = "M20,156 H184 V284 H20 Z";
+  const r = (z, c, d) => `<g clip-path="url(#zp-${c})"><path class="zp${sel === z ? " on" : ""}" data-zpick="${z}" d="${d}"><title>Zone ${z} · ${ZONES[z]}</title></path></g>`;
+  const t = (z, x, y, sm) => `<text x="${x}" y="${y}" class="${sm ? "sm" : ""}${sel === z ? " on" : ""}">${z}</text>`;
+  return `<svg class="zpcourt" viewBox="0 0 400 440" aria-label="Pick a shot zone"><defs><clipPath id="zp-t"><polygon points="${top}"/></clipPath><clipPath id="zp-m"><polygon points="${mid}"/></clipPath><clipPath id="zp-b"><polygon points="${bot}"/></clipPath></defs>
+    ${r("Z", "t", court)}${r("Y", "m", court)}${r("X", "b", court)}${r("C", "t", arc)}${r("B", "m", arc)}${r("A", "b", arc)}${r("3", "t", lane)}${r("2", "m", lane)}${r("1", "b", lane)}
+    <path class="zp${sel === "R" ? " on" : ""}" data-zpick="R" d="M20,196 H56 V220 H20 Z"><title>Zone R · right of the rim</title></path><path class="zp${sel === "L" ? " on" : ""}" data-zpick="L" d="M20,220 H56 V244 H20 Z"><title>Zone L · left of the rim</title></path>
+    <g class="zpl" pointer-events="none"><path d="${arc}"/><path d="${lane}"/><line x1="44" y1="220" x2="400" y2="57"/><line x1="44" y1="220" x2="400" y2="383"/><line x1="20" y1="0" x2="20" y2="440" class="base"/><circle cx="44" cy="220" r="7"/></g>
+    <g pointer-events="none">${t("Z", 290, 80)}${t("Y", 330, 232)}${t("X", 290, 390)}${t("C", 130, 100)}${t("B", 214, 232)}${t("A", 130, 370)}${t("3", 118, 186)}${t("2", 150, 236)}${t("1", 118, 276)}${t("R", 38, 214, 1)}${t("L", 38, 240, 1)}</g></svg>`;
+}
+function renderZonePad() {
+  const pad = $("zPad"); if (!pad) return;
+  const on = zpadOn() && !(typeof viewOnly === "function" && viewOnly());
+  pad.hidden = !on; if (!on) return;
+  const c = zpadCurrent();
+  const left = tlPlays().reduce((n, p) => n + p.items.filter(it => /^[23][MX]$/.test(it.k) && !it.zone && (!TL.who || it.p === TL.who)).length, 0);
+  const z = c && c.it.zone;
+  pad.innerHTML = `${zpadCourt(z)}
+    <div class="zpinfo">
+      <div class="label">Shot zone</div>
+      ${c ? `<div class="zpshot"><b>${fmtT(c.p.t)}</b> ${itemTag(c.it)}</div><div class="small">“${esc(c.p.text)}”</div>` : `<div class="small">No shot here yet. Press Next to go to the first one.</div>`}
+      <div class="zpbtns">${ZORDER.map(k => `<button class="zpb${z === k ? " on" : ""}" data-zpick="${k}" title="${esc(ZONES[k])}" ${c ? "" : "disabled"}>${k}</button>`).join("")}<button class="zpb clr" data-zpick="" title="Clear the zone" ${c && z ? "" : "disabled"}>✕</button></div>
+      <div class="row"><label class="small zpauto"><input type="checkbox" id="zpAuto" ${TL.zAuto ? "checked" : ""}> Go to the next shot after picking</label><span class="small">${left ? `${left} shot${left === 1 ? "" : "s"} on this video still need a zone` : "Every shot on this video has a zone"}</span></div>
+    </div>`;
+}
+function zpadPick(z) {
+  const c = zpadCurrent(); if (!c) return;
+  const s = cur();
+  c.it.zone = z || null; const moved = fitZone(c.it);
+  c.p.warns = (c.p.warns || []).filter(w => !/^Zone /.test(w)); c.p.tlEdited = true;
+  TL.cur = { id: c.p.id, ix: c.ix }; TL.lastT = c.p.t;
+  save(); renderPBP(); renderTally();
+  toast(z ? `${fmtT(c.p.t)} ${c.it.p ? short(c.it.p) + " " : ""}· Zone ${z}${moved ? " · now a " + KNAME[c.it.k] : ""}` : "Zone cleared");
+  if (z && TL.zAuto) setTimeout(() => tlStep(1), 350);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-zpick]"); if (!b || !b.closest("#zPad")) return;
+  if (b.disabled) return; zpadPick(b.dataset.zpick);
+});
+document.addEventListener("change", e => { if (e.target.id === "zpAuto") TL.zAuto = e.target.checked });
+
 // right-click edit: change the player, the action, the squad or the time, or delete the action; the play-by-play and totals follow
 function tlCloseMenu() { const m = $("tlMenu"); if (m) m.remove(); TL.ed = null }
 function tlOpenMenu(ev, mk) {
@@ -2266,6 +2472,7 @@ function tlOpenMenu(ev, mk) {
   const m = document.createElement("div"); m.className = "tledit"; m.id = "tlMenu";
   m.innerHTML = `<h4>Edit action</h4><span class="small">“${esc(p.text)}”</span>
     <div class="field"><label class="label" for="tmP">Player</label><select id="tmP"><option value="">No player</option>${names.map(n => `<option ${n === it.p ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+    <div class="field" id="tmZf"><label class="label" for="tmZ">Shot zone</label><select id="tmZ"><option value="">No zone</option>${ZORDER.map(z => `<option value="${z}" ${it.zone === z ? "selected" : ""}>${z} · ${ZONES[z]}</option>`).join("")}</select></div>
     <div class="field"><label class="label" for="tmK">Action</label><select id="tmK">${codes.map(c => `<option value="${c}" ${c === it.k ? "selected" : ""}>${esc(KNAME[c])}</option>`).join("")}</select></div>
     ${scrim ? `<div class="field"><label class="label" for="tmQ">Squad (this player, this session)</label><select id="tmQ"><option value="">Not set</option>${S.squads.map(q => `<option ${q === ((s.squadOf || {})[it.p] || p.squad) ? "selected" : ""}>${esc(q)}</option>`).join("")}</select></div>` : ""}
     <div class="field"><span class="label">Time</span><div class="row"><button class="ib" data-tm="-1">−1s</button><span class="tmT" id="tmT">${fmtT(p.t)}</span><button class="ib" data-tm="1">+1s</button><button class="ib" data-tm="now" title="Use where the film is now">Use film time</button></div></div>
@@ -2274,6 +2481,7 @@ function tlOpenMenu(ev, mk) {
   document.body.appendChild(m);
   const x = Math.min(ev.clientX + 4, window.innerWidth - m.offsetWidth - 8), y = Math.min(ev.clientY + 4, window.innerHeight - m.offsetHeight - 8);
   m.style.left = Math.max(8, x) + "px"; m.style.top = Math.max(8, y) + "px";
+  const zf = () => { $("tmZf").hidden = !/^[23][MX]$/.test($("tmK").value) }; zf(); $("tmK").addEventListener("change", zf);
   // the squad box follows the chosen player; it is only saved when the coach changes it
   if (scrim) {
     const sqOf = n => (n && (s.squadOf || {})[n]) || "";
@@ -2298,14 +2506,15 @@ function tlOpenMenu(ev, mk) {
       const np = $("tmP").value || null, nk = $("tmK").value, nq = scrim ? $("tmQ").value : "";
       const was = (it.p ? short(it.p) + " " : "") + KNAME[it.k];
       const next = Object.assign({}, it, { k: nk, p: np });
-      if (!/^[23][MX]$/.test(nk)) delete next.tier;
+      if (!/^[23][MX]$/.test(nk)) { delete next.tier; delete next.zone }
+      else { const nz = $("tmZ").value || null; const zc = nz !== (it.zone || null); next.zone = nz; if (zc) fitZone(next) }
       if (nk !== "TO") { delete next.toType; delete next.ball }
       p.items[ix] = next;
       if (scrim && np && nq && TL.ed.sqDirty) { s.squadOf = s.squadOf || {}; s.squadOf[np] = nq }
       if (TL.ed.t !== p.t) p.t = TL.ed.t;
       p.tlEdited = true;
       tlCloseMenu(); save(); renderPBP(); renderTally();
-      toast(`Updated: ${was} → ${(np ? short(np) + " " : "") + KNAME[nk]}`);
+      toast(`Updated: ${was} → ${(np ? short(np) + " " : "") + KNAME[next.k]}${next.zone ? " · Zone " + next.zone : ""}`);
     }
   });
 }
@@ -2330,7 +2539,7 @@ function tlFlash(id) {
   grid.addEventListener("mouseleave", () => tip.hidden = true);
   grid.addEventListener("click", e => {
     const m = e.target.closest(".tlm");
-    if (m) { const p = tlFindPlay(m.dataset.tlplay); if (p) { jump(p); tlFlash(p.id) } return }
+    if (m) { const p = tlFindPlay(m.dataset.tlplay); if (p) { TL.lastT = p.t; TL.cur = { id: p.id, ix: +m.dataset.i }; jump(p); tlFlash(p.id); renderZonePad() } return }
     const lane = e.target.closest(".tllane"); if (lane) { seekTo(tlTimeAt(e.clientX, lane)); updateTimeline(true) }
   });
   grid.addEventListener("pointerdown", e => {
@@ -2345,7 +2554,7 @@ function tlFlash(id) {
   });
   const end = () => { TL.drag = false }; grid.addEventListener("pointerup", end); grid.addEventListener("pointercancel", end);
   $("tlWho").addEventListener("change", e => { TL.who = e.target.value; TL.lastT = null; renderTimeline() });
-  $("tlAct").addEventListener("change", e => { TL.act = e.target.value; TL.lastT = null; renderTimeline() });
+  $("tlAct").addEventListener("change", e => { TL.act = e.target.value; TL.lastT = null; TL.cur = null; renderTimeline() });
   grid.addEventListener("contextmenu", e => { const m = e.target.closest(".tlm"); if (!m) return; e.preventDefault(); tip.hidden = true; tlOpenMenu(e, m) });
   document.addEventListener("pointerdown", e => { const m = $("tlMenu"); if (m && !m.contains(e.target)) tlCloseMenu() }, true);
   const tlShow = on => { S.tlOff = !on; $("tl").hidden = !on; const b = $("tlTog"); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "Timeline on" : "Timeline off"; if (on) renderTimeline() };
@@ -2451,12 +2660,24 @@ document.addEventListener("click", e => {
     case "restore": $("restoreIn").click(); break;
   }
 });
+document.addEventListener("click", e => {
+  const zr = e.target.closest && e.target.closest("[data-zclick]"); if (!zr) return;
+  const td = document.querySelector(`#tbl-zones td[data-zc="${zr.dataset.zclick}"]`);
+  if (td && td.classList.contains("clip")) openClips(td); else toast(`No shots from Zone ${zr.dataset.zclick}${chartWho ? " by " + short(chartWho) : ""} yet.`);
+});
 document.addEventListener("change", e => {
   if (e.target.id === "fType") { pullForm(); renderForm() }
   if (e.target.dataset && e.target.dataset.act === "assign" && !blockView()) {
     const s = cur(); const p = s.plays.find(x => x.id === e.target.dataset.id); if (!p || !e.target.value) return;
     p.items.forEach(i => { if (!i.p) i.p = e.target.value }); p.warns = p.warns.filter(w => !/No player|Which player/.test(w)); save(); renderPBP(); renderTally();
   }
+  if (e.target.dataset && e.target.dataset.act === "zone-set" && !blockView()) {
+    const s = cur(); const p = s.plays.find(x => x.id === e.target.dataset.id); const it = p && p.items[+e.target.dataset.i]; if (!it) return;
+    it.zone = e.target.value || null; const was = it.k; const moved = fitZone(it);
+    p.warns = p.warns.filter(w => !/^Zone /.test(w));
+    save(); renderPBP(); renderTally(); toast(moved ? `Zone ${it.zone}: changed to a ${KNAME[it.k]}` : it.zone ? `Zone ${it.zone} set` : "Zone cleared");
+  }
+  if (e.target.id === "chartWho") { chartWho = e.target.value; renderTally() }
   if (e.target.id === "manualT") { const t = parseT(e.target.value); if (t != null) V.manual = t }
 });
 $("restoreIn").addEventListener("change", e => {
@@ -2512,7 +2733,7 @@ async function writeBook(s) {
   s.plays.slice().sort((a, b) => ((POR.indexOf(a.period) + 1 || 99) - (POR.indexOf(b.period) + 1 || 99)) || (a.t - b.t)).forEach(p => p.items.forEach(it => {
     const sh = isS(it.k);
     items.push({ per: PLAB[p.period] || p.period || "", t: Math.round(p.t), clock: clock(p.t), squad: itemSquad(p, it) || "", p: it.p || "", k: it.k, stat: KNAME[it.k] || it.k,
-      stype: sh ? (it.stype || "Type not said") : "", tier: sh ? (it.tier || "Not graded") : "", totype: it.k === "TO" ? (it.toType || "Not said") : "", ball: it.k === "TO" ? (it.ball || "Not said") : "",
+      stype: sh ? (it.stype || "Type not said") : "", tier: sh ? (it.tier || "Not graded") : "", zone: sh ? (it.zone || "No zone") : "", totype: it.k === "TO" ? (it.toType || "Not said") : "", ball: it.k === "TO" ? (it.ball || "Not said") : "",
       detail: it.detail || "", video: vlab[p.vid] || (p.vid === "local" ? "File" : ""), text: p.text || "" });
   }));
   const order = S.roster.map(r => r.name);
@@ -2587,15 +2808,15 @@ async function writeBook(s) {
   ks.getColumn(1).width = 24; ks.getColumn(2).width = 10; ks.getColumn(3).width = 11; ks.getColumn(4).width = 64;
 
   // ---------- Box & HVP, Shots, Turnovers (created now so the tab order is right; Play Log last) ----------
-  const ws = sheet("Box & HVP"), sh = sheet("Shots"), to = sheet("Turnovers"), lg = sheet("Play Log");
+  const ws = sheet("Box & HVP"), sh = sheet("Shots"), zc = sheet("Shot Chart"), to = sheet("Turnovers"), lg = sheet("Play Log");
   // ---------- Play Log ----------
-  const LCOLS = ["Period", "Clock", "Seconds", "Squad", "Player", "Code", "Stat", "Shot type", "Tier", "TO type", "Live/Dead", "Detail", "Video", "Call as spoken"];
+  const LCOLS = ["Period", "Clock", "Seconds", "Squad", "Player", "Code", "Stat", "Shot type", "Tier", "Zone", "TO type", "Live/Dead", "Detail", "Video", "Call as spoken"];
   title(lg, "Play Log", "One row per stat, from the Film Caller. Correct a row here and every tab updates.");
   hdr(lg, 4, 1, LCOLS);
-  items.forEach((it, i) => [it.per, it.clock, it.t, it.squad, it.p, it.k, it.stat, it.stype, it.tier, it.totype, it.ball, it.detail, it.video, it.text].forEach((v, c) => put(lg, 5 + i, c + 1, v, { font: BLUE, al: c === 13 ? L : undefined })));
+  items.forEach((it, i) => [it.per, it.clock, it.t, it.squad, it.p, it.k, it.stat, it.stype, it.tier, it.zone, it.totype, it.ball, it.detail, it.video, it.text].forEach((v, c) => put(lg, 5 + i, c + 1, v, { font: BLUE, al: c === 14 ? L : undefined })));
   lg.views = [{ state: "frozen", ySplit: 4, showGridLines: false }];
-  lg.autoFilter = { from: "A4", to: "N" + (4 + Math.max(1, items.length)) };
-  [8, 7, 8, 8, 20, 6, 15, 16, 11, 10, 9, 10, 10, 50].forEach((x, i) => lg.getColumn(i + 1).width = x);
+  lg.autoFilter = { from: "A4", to: "O" + (4 + Math.max(1, items.length)) };
+  [8, 7, 8, 8, 20, 6, 15, 16, 11, 8, 10, 9, 10, 10, 50].forEach((x, i) => lg.getColumn(i + 1).width = x);
   const LC = {}; LCOLS.forEach((n, i) => LC[n] = `'Play Log'!$${col(i + 1)}$5:$${col(i + 1)}$3000`);
   const cnt = (crit) => "COUNTIFS(" + crit.map(([k, v]) => `${LC[k]},${v}`).join(",") + ")";
   const q = v => `"${v}"`;
@@ -2702,10 +2923,37 @@ async function writeBook(s) {
     put(sh, r, 4, `=IF(B${r}=0,"",C${r}/B${r})`, { fmt: PCT }); put(sh, r, 5, `=IF(B${r}=0,"",(2*${c2("2M")}+3*${c2("3M")})/B${r})`, { fmt: DEC2, font: BOLD, fill: C.hl }); r++ });
   r += 2;
   sec(sh, r, 1, 9, "EVERY SHOT (copied from the Play Log for review)"); r++;
-  hdr(sh, r, 1, ["Period", "Clock", "Player", "Squad", "Result", "Shot type", "Tier", "Video", "Call as spoken"]); r++;
-  items.filter(i => isS(i.k)).forEach(it => { [it.per, it.clock, it.p, it.squad, (it.k[1] === "M" ? "Made " : "Missed ") + it.k[0], it.stype, it.tier, it.video, it.text].forEach((v, c) => put(sh, r, c + 1, v, { font: BLUE, al: c === 2 || c === 8 ? L : undefined })); r++ });
+  hdr(sh, r, 1, ["Period", "Clock", "Player", "Squad", "Result", "Shot type", "Tier", "Zone", "Video", "Call as spoken"]); r++;
+  items.filter(i => isS(i.k)).forEach(it => { [it.per, it.clock, it.p, it.squad, (it.k[1] === "M" ? "Made " : "Missed ") + it.k[0], it.stype, it.tier, it.zone, it.video, it.text].forEach((v, c) => put(sh, r, c + 1, v, { font: BLUE, al: c === 2 || c === 9 ? L : undefined })); r++ });
   sh.views = [{ state: "frozen", xSplit: 2, ySplit: 5, showGridLines: false }];
   sh.getColumn(1).width = 22; sh.getColumn(2).width = 9; sh.getColumn(3).width = 18; for (let c = 4; c <= 18; c++) sh.getColumn(c).width = 9.5; sh.getColumn(6).width = 16; sh.getColumn(9).width = 12;
+
+  // ---------- Shot Chart (Dean Oliver zones) ----------
+  title(zc, `${s.name} · Shot chart`, "Dean Oliver's zones from Basketball on Paper: R/L either side of the rim · 1, 2, 3 the paint · A, B, C mid-range · X, Y, Z threes");
+  sec(zc, 4, 1, 8, "BY ZONE"); hdr(zc, 5, 1, ["Zone", "Area", "Att", "Made", "FG%", "Pts", "Pts / shot", "Share"]);
+  const zcount = (zs, ks2, extra) => zs.map(z => ks2.map(k => cnt([["Zone", q(z)], ["Code", q(k)], ...(extra || [])])).join("+")).join("+");
+  r = 6; const zrow0 = r; const zTotRow = 6 + ZORDER.length + ZGROUPS.length;
+  const zline = (label, area, zs, bold) => {
+    put(zc, r, 1, label, { font: BOLD, al: L, fill: bold ? C.tot : undefined }); put(zc, r, 2, area, { al: L, fill: bold ? C.tot : undefined });
+    put(zc, r, 3, "=" + zcount(zs, ["2M", "2X", "3M", "3X"]), { fmt: NUM, font: bold ? BOLD : undefined, fill: bold ? C.tot : undefined });
+    put(zc, r, 4, "=" + zcount(zs, ["2M", "3M"]), { fmt: NUM, font: bold ? BOLD : undefined, fill: bold ? C.tot : undefined });
+    put(zc, r, 5, `=IF(C${r}=0,"",D${r}/C${r})`, { fmt: PCT, fill: bold ? C.tot : undefined });
+    put(zc, r, 6, `=2*(${zcount(zs, ["2M"])})+3*(${zcount(zs, ["3M"])})`, { fmt: NUM, fill: bold ? C.tot : undefined });
+    put(zc, r, 7, `=IF(C${r}=0,"",F${r}/C${r})`, { fmt: DEC2, font: BOLD, fill: C.hl });
+    put(zc, r, 8, `=IF($C$${zTotRow}=0,"",C${r}/$C$${zTotRow})`, { fmt: PCT, fill: bold ? C.tot : undefined }); r++ };
+  ZGROUPS.forEach(([g, zs]) => { zs.forEach(z => zline(z, ZONES[z], [z])); zline(g + " total", "", zs, true) });
+  zline("All zoned shots", "", ZORDER, true);
+  put(zc, r, 1, "No zone", { font: BOLD, al: L }); put(zc, r, 3, "=" + zcount(["No zone"], ["2M", "2X", "3M", "3X"]), { fmt: NUM }); put(zc, r, 2, "Shots booked without a zone", { al: L }); r += 3;
+  const ZP = ["Player", "Squad", ...ZGROUPS.flatMap(([g]) => [g + " M", g + " A", g + " %"]), "No zone"];
+  sec(zc, r, 1, ZP.length, "BY PLAYER"); r++; hdr(zc, r, 1, ZP); r++;
+  players.forEach(n => { const P = `$A${r}`;
+    put(zc, r, 1, n, { font: BOLD, al: L }); put(zc, r, 2, `=${BX}B${pr[n]}`, { font: GREEN });
+    ZGROUPS.forEach(([, zs], j) => { const c0 = 3 + 3 * j;
+      put(zc, r, c0, "=" + zcount(zs, ["2M", "3M"], [["Player", P]]), { fmt: NUM }); put(zc, r, c0 + 1, "=" + zcount(zs, ["2M", "2X", "3M", "3X"], [["Player", P]]), { fmt: NUM });
+      put(zc, r, c0 + 2, `=IF(${col(c0 + 1)}${r}=0,"",${col(c0)}${r}/${col(c0 + 1)}${r})`, { fmt: PCT }) });
+    put(zc, r, ZP.length, "=" + zcount(["No zone"], ["2M", "2X", "3M", "3X"], [["Player", P]]), { fmt: NUM }); r++ });
+  zc.views = [{ state: "frozen", ySplit: 5, showGridLines: false }];
+  zc.getColumn(1).width = 22; zc.getColumn(2).width = 18; for (let c = 3; c <= ZP.length; c++) zc.getColumn(c).width = 9.5;
 
   // ---------- Turnovers ----------
   title(to, `${s.name} · Turnovers`, "Turnover type and live or dead come from the call. 'Not said' shows what still needs classifying.");
