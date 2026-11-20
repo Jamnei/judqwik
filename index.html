@@ -229,6 +229,40 @@ th.grp{background:var(--raise);color:var(--ink)}
 .tlnav{display:flex;gap:6px}
 .tlnav .ib{height:28px}
 .play.tlhit{background:var(--heat-soft)}
+
+/* ----- JUDQWIK round 2: team-colour action boxes, filters, edit menu, one-screen full-screen view ----- */
+.tlm{background:var(--j-other);color:var(--ink);border:1.5px solid rgba(0,0,0,.45)}
+.tlm.tm-white{background:var(--j-white);color:#14181C;border-color:#9aa6b1}
+.tlm.tm-blue{background:var(--j-blue);color:#fff;border-color:#1c4a96}
+.tlm.tm-black{background:var(--j-black);color:#fff;border-color:#8a96a3}
+.tlm.tm-heat{background:var(--heat);color:var(--heat-ink);border-color:#a54f22}
+.tlm.ok{border:2.5px solid #2BFF5E!important;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 7px rgba(43,255,94,.55)}
+.tlm.no{border:2.5px solid #FF3B30!important;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
+.tlm.dot{border-width:2px}
+.tlm.dim{opacity:.16}
+.tlkey{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:2px;border:1.5px solid #556270}
+.tlkey.tm-white{background:var(--j-white)} .tlkey.tm-blue{background:var(--j-blue)} .tlkey.tm-black{background:var(--j-black);border-color:#8a96a3}
+.tlkey.ok{background:none;border:2.5px solid #2BFF5E} .tlkey.no{background:none;border:2.5px solid #FF3B30}
+.tlstep{display:inline-flex;gap:4px}
+.tlstep .tbtn{padding:0 10px;min-width:auto;font-size:13.5px}
+.tltog{min-width:auto;padding:0 12px;font-size:13.5px}
+.tltog[aria-pressed="true"]{background:var(--heat-soft);border-color:var(--heat)}
+.tledit{position:fixed;z-index:70;width:300px;max-width:calc(100vw - 16px);background:var(--raise);border:1px solid #3d4b57;border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.55);padding:12px;display:flex;flex-direction:column;gap:9px;font-size:13.5px}
+.tledit h4{margin:0;font:700 17px var(--display);letter-spacing:.04em;text-transform:uppercase}
+.tledit .field{gap:3px}
+.tledit select{width:100%;min-height:34px;padding:4px 8px}
+.tledit .row .ib{height:30px}
+.tledit .tmT{font:700 18px var(--display);font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
+.tledit .btn{min-height:34px;padding:0 12px}
+body.fs{padding-block:0}
+body.fs header.top,body.fs #totalsCard,body.fs #ytMsg,body.fs .tlfoot{display:none!important}
+body.fs .callgrid{padding-top:8px;height:100vh;align-items:stretch}
+body.fs .callgrid>.card:first-child{height:calc(100vh - 16px);gap:8px;padding:10px}
+body.fs .vidbox{flex:1 1 0;min-height:0;aspect-ratio:auto;max-height:none}
+body.fs .tl{padding:6px 8px 8px;gap:4px}
+body.fs .transport{flex:none}
+body.fs .pbpcard{position:static;height:calc(100vh - 16px)}
+body.fs .pbp{max-height:none;flex:1 1 0;min-height:0}
 </style>
 </head>
 <body>
@@ -267,17 +301,17 @@ th.grp{background:var(--raise);color:var(--ink)}
         <div class="tl" id="tl" aria-label="Timeline of recorded actions">
           <div class="tlhead"><span class="label">Timeline</span><span class="small" id="tlCount"></span>
             <select id="tlWho" title="Highlight one player"><option value="">All players</option></select>
+            <select id="tlAct" title="Show only one kind of action"></select>
             <span class="tlzoom" id="tlZoom"></span></div>
           <div class="tlgrid" id="tlGrid"></div>
-          <div class="tlfoot"><span class="small">Green outline = made shot · small square = player's squad · click a marker to replay · click a row to jump · drag the ruler to scrub</span>
-            <div class="tlnav"><button class="ib" data-act="tl-prev" title="Previous action (,)">◀ Prev</button><button class="ib" data-act="tl-next" title="Next action (.)">Next ▶</button></div></div>
+          <div class="tlfoot"><span class="small"><span class="tlkey tm-white"></span><span class="tlkey tm-blue"></span><span class="tlkey tm-black"></span> box colour = the squad of the player who did it · <span class="tlkey ok"></span> made · <span class="tlkey no"></span> missed · click an action to replay it · right-click to edit it · drag the ruler to scrub</span></div>
         </div>
         <div class="transport">
           <button class="tbtn" data-act="seek" data-d="-step" id="backBtn" title="Back (←)">−3</button>
           <button class="tbtn" data-act="toggle" id="playBtn" title="Play / pause (space)" style="min-width:60px">▶</button>
           <button class="tbtn" data-act="seek" data-d="step" id="fwdBtn" title="Forward (→)">+3</button>
           <div class="clock" id="clock">0:00</div>
-          <span class="qual" id="qual" hidden></span><button class="tbtn" data-act="fullscreen" id="fsBtn" title="Full screen: a bigger player gets a sharper picture from YouTube" style="min-width:auto;padding:0 12px">⛶ Full screen</button>
+          <span class="qual" id="qual" hidden></span><span class="tlstep"><button class="tbtn" data-act="tl-prev" id="tlPrev" title="Previous action (,)">◀ Prev</button><button class="tbtn" data-act="tl-next" id="tlNext" title="Next action (.)">Next ▶</button></span><button class="tbtn tltog" data-act="tl-toggle" id="tlTog" title="Show or hide the timeline (T)" aria-pressed="true">Timeline on</button><button class="tbtn" data-act="fullscreen" id="fsBtn" title="Full screen: a bigger player gets a sharper picture from YouTube" style="min-width:auto;padding:0 12px">⛶ Full screen</button>
           <select id="rate" title="Playback speed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
           <span class="label" style="margin-left:auto">Period</span>
           <div class="chips" id="perChips"></div>
@@ -307,7 +341,7 @@ th.grp{background:var(--raise);color:var(--ink)}
       </div>
     </div>
 
-    <div class="card" style="margin-top:14px">
+    <div class="card" id="totalsCard" style="margin-top:14px">
       <div class="tallyhead">
         <span class="label">Session totals</span>
         <div class="row">
@@ -1323,7 +1357,7 @@ function renderPBP() {
         ${(() => { const s0 = cur(); if (!s0 || s0.type !== "Scrimmage" || viewOnly() || p.squad) return ""; const need = [...new Set(p.items.map(i => i.p).filter(n => n && !(s0.squadOf || {})[n]))]; return need.map(n => `<div class="row" style="gap:4px"><span class="warn" style="font-size:12px">${esc(short(n))} has no squad:</span>${S.squads.map(q => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="set-squad" data-p="${esc(n)}" data-q="${esc(q)}"><span class="sw" style="background:${sqColor(q)}"></span> ${esc(q)}</button>`).join("")}</div>`).join("") })()}
         ${viewOnly() ? "" : p.items.map((i, ix) => i.k !== "TO" || (i.toType && i.ball) ? "" : `<div class="row" style="gap:4px">${!i.toType ? `<span class="warn" style="font-size:12px">Turnover type:</span>${["Passing", "Handling", "Violation", "Rushed"].map(t => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="to-set" data-id="${p.id}" data-i="${ix}" data-f="toType" data-v="${t}">${t}</button>`).join("")}` : ""}${!i.ball ? `<span class="warn" style="font-size:12px">${i.toType ? "Ball:" : "·"}</span>${["Live", "Dead"].map(t => `<button class="chip" style="min-height:26px;padding:2px 8px;font-size:12px" data-act="to-set" data-id="${p.id}" data-i="${ix}" data-f="ball" data-v="${t}">${t}</button>`).join("")}` : ""}</div>`).join("")}
         ${unresolved && !viewOnly() ? `<div class="row"><span class="small">Give it to</span><select data-act="assign" data-id="${p.id}"><option value="">Choose player</option>${S.roster.filter(r => r.name).map(r => `<option>${esc(r.name)}</option>`).join("")}</select></div>` : ""}
-        <div class="tx">“${esc(p.text)}”</div></div>
+        <div class="tx">“${esc(p.text)}”${p.tlEdited ? ` <span class="warn" style="font-size:12px;font-style:normal">· corrected on the timeline</span>` : ""}</div></div>
       <div class="acts" ${viewOnly() ? "hidden" : ""}><button class="ib" data-act="edit" data-id="${p.id}" title="Edit">Edit</button><button class="ib ${armed === p.id ? "armed" : ""}" data-act="del" data-id="${p.id}" title="Delete">${armed === p.id ? "Delete" : "✕"}</button></div>
     </div>`;
   }).join("") : `<div style="padding:16px 14px" class="note">No plays yet. Press the mic or type a call.</div>`;
@@ -2125,10 +2159,11 @@ function renderTimeline() {
   for (const p of plays) {
     if (p.t < a - 2 || p.t > b + 2) continue; shown++;
     const seen = new Set();
-    for (const it of p.items) {
-      const key = p.id + ":" + it.k + ":" + (it.p || ""); if (seen.has(key)) continue; seen.add(key);
-      const side = sideOf[key]; if (side) rows[side].push({ p, it });
-    }
+    p.items.forEach((it, ix) => {
+      const key = p.id + ":" + it.k + ":" + (it.p || ""); if (seen.has(key)) return; seen.add(key);
+      if (!tlMatch(it)) return;
+      const side = sideOf[key]; if (side) rows[side].push({ p, it, ix });
+    });
   }
   // two tiers per row: a marker drops to the lower tier when it would cover its neighbour, and shrinks to a dot when both are full
   const place = list => {
@@ -2143,10 +2178,11 @@ function renderTimeline() {
     });
   };
   const marker = m => {
-    const cls = TL_CLS[m.it.k] || "hvp";
+    const team = tlTeam(m.p, m.it); const tk = String(team || "").toLowerCase();
+    const tcls = tk === "heat" ? "tm-heat" : ["white", "blue", "black"].includes(tk) ? "tm-" + tk : "tm-none";
+    const out = ["2M", "3M", "FM"].includes(m.it.k) ? " ok" : ["2X", "3X", "FX"].includes(m.it.k) ? " no" : "";
     const dim = TL.who && m.it.p !== TL.who ? " dim" : "";
-    const team = tlTeam(m.p, m.it); const sq = s.type === "Scrimmage" && team ? `<i style="background:${tlPossColor(team)}"></i>` : "";
-    return `<span class="tlm ${cls}${dim}${m.dot ? " dot" : ""} t${m.tier}" data-tlplay="${m.p.id}" data-k="${m.it.k}" style="left:${tlPct(m.p.t)}%" aria-label="${esc(fmtT(m.p.t) + " " + (m.it.p ? short(m.it.p) + " " : "") + (KNAME[m.it.k] || m.it.k))}">${m.dot ? "" : sq + esc(m.txt)}</span>`;
+    return `<span class="tlm ${tcls}${out}${dim}${m.dot ? " dot" : ""} t${m.tier}" data-tlplay="${m.p.id}" data-i="${m.ix}" data-k="${m.it.k}" style="left:${tlPct(m.p.t)}%" aria-label="${esc(fmtT(m.p.t) + " " + (m.it.p ? short(m.it.p) + " " : "") + (KNAME[m.it.k] || m.it.k) + (team && team !== "Heat" ? " · " + team : ""))}">${m.dot ? "" : esc(m.txt)}</span>`;
   };
   const poss = segs.filter(x => x.b >= a && x.a <= b).map(x => {
     const l = Math.max(0, tlPct(x.a)), r = Math.min(100, tlPct(x.b)); const wpx = (r - l) / 100 * W;
@@ -2160,7 +2196,11 @@ function renderTimeline() {
     `<span class="tllab">Poss.</span><div class="tllane poss" data-tllane="poss">${poss || `<span class="tlnone">Possession fills in as you call shots, steals and rebounds</span>`}</div>` +
     [["score", "Scoring"], ["off", "Offence"], ["def", "Defence"]].map(([k, n]) => `<span class="tllab tall">${n}</span><div class="tllane tall" data-tllane="${k}">${place(rows[k]).map(marker).join("")}</div>`).join("") +
     `<div class="tlph" id="tlPh"></div>`;
-  $("tlCount").textContent = plays.length ? `${plays.length} play${plays.length === 1 ? "" : "s"} on this video${shown !== plays.length ? " · " + shown + " in view" : ""}` : "No plays on this video yet";
+  const nAct = tlActPlays().length, fl = tlActLabel();
+  $("tlCount").textContent = !plays.length ? "No plays on this video yet" : (TL.act !== "all" || TL.who) ? `${nAct} ${fl}${TL.who ? " by " + short(TL.who) : ""} on this video` : `${plays.length} play${plays.length === 1 ? "" : "s"} on this video${shown !== plays.length ? " · " + shown + " in view" : ""}`;
+  $("tlAct").innerHTML = TL_FILTERS.map(g => g[0] ? `<optgroup label="${g[0]}">${g[1].map(f => `<option value="${f[0]}" ${f[0] === TL.act ? "selected" : ""}>${f[1]}</option>`).join("")}</optgroup>` : g[1].map(f => `<option value="${f[0]}" ${f[0] === TL.act ? "selected" : ""}>${f[1]}</option>`).join("")).join("");
+  const nm = TL.act === "all" ? "" : " " + tlActShort();
+  $("tlPrev").textContent = "◀ Prev" + nm; $("tlNext").textContent = "Next" + nm + " ▶";
   TL.key = tlZoom() + "|" + a + "|" + b + "|" + plays.length + "|" + (s.curVid || "");
   updateTimeline(true);
 }
@@ -2185,12 +2225,91 @@ function updateTimeline(force) {
 }
 function tlTimeAt(x, el) { const r = el.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (x - r.left) / r.width)); return TL.win[0] + f * (TL.win[1] - TL.win[0]) }
 function tlFindPlay(id) { const s = cur(); return s && s.plays.find(p => p.id === id) }
+// action filter: what the coach wants to see and step through
+const TL_FILTERS = [
+  ["", [["all", "All actions"]]],
+  ["Scoring", [["shots", "All shots"], ["made", "Made shots"], ["miss", "Missed shots"], ["two", "2PT shots"], ["three", "3PT shots"], ["ft", "Free throws"]]],
+  ["Offence", [["ohvp", "Offensive HVP"], ["ast", "Assists"], ["to", "Turnovers"], ["oreb", "Offensive rebounds"], ["paint", "Paint touches (P6 + PT)"], ["rr", "Right reads"], ["up", "Upcycles"]]],
+  ["Defence", [["dhvp", "Defensive HVP"], ["stl", "Steals"], ["dreb", "Defensive rebounds"], ["blk", "Blocks"], ["chg", "Charges"], ["tip", "Tips / deflections"], ["purs", "Ball pursuit"], ["you", "YOU"], ["wall", "WallUps"], ["foul", "Fouls"]]],
+];
+const TL_FCODES = { shots: ["2M","3M","FM","2X","3X","FX"], made: ["2M","3M","FM"], miss: ["2X","3X","FX"], two: ["2M","2X"], three: ["3M","3X"], ft: ["FM","FX"],
+  ohvp: ["P6","OR","PT","RR","UP"], ast: ["AS"], to: ["TO"], oreb: ["OR"], paint: ["P6","PT"], rr: ["RR"], up: ["UP"],
+  dhvp: ["ST","CH","TP","PU","YO","BK","WU"], stl: ["ST"], dreb: ["DR"], blk: ["BK"], chg: ["CH"], tip: ["TP"], purs: ["PU"], you: ["YO"], wall: ["WU"], foul: ["PF"] };
+const TL_FSHORT = { shots: "shot", made: "make", miss: "miss", two: "2PT", three: "3PT", ft: "FT", ohvp: "off. HVP", ast: "AST", to: "TO", oreb: "OR", paint: "paint touch", rr: "RR", up: "UP",
+  dhvp: "def. HVP", stl: "STL", dreb: "DR", blk: "BLK", chg: "charge", tip: "tip", purs: "pursuit", you: "YOU", wall: "WallUp", foul: "foul" };
+TL.act = "all";
+function tlMatch(it) { return TL.act === "all" || (TL_FCODES[TL.act] || []).includes(it.k) }
+function tlActLabel() { for (const g of TL_FILTERS) for (const f of g[1]) if (f[0] === TL.act) return f[1].toLowerCase(); return "actions" }
+function tlActShort() { return TL_FSHORT[TL.act] || "" }
+function tlActPlays() { return tlPlays().filter(p => p.items.some(it => tlMatch(it) && (!TL.who || it.p === TL.who))) }
 function tlStep(dir) {
-  const plays = tlPlays().filter(p => !TL.who || p.items.some(i => i.p === TL.who)); if (!plays.length) return;
-  const t = now() + S.leadIn;   // compare against the play time, since replays start a lead-in before it
-  const p = dir > 0 ? plays.find(x => x.t > t + 0.5) : plays.slice().reverse().find(x => x.t < t - 0.5);
-  if (p) { jump(p); tlFlash(p.id) } else toast(dir > 0 ? "That's the last action on this video." : "That's the first action on this video.");
+  const plays = tlActPlays();
+  if (!plays.length) { toast(`No ${tlActLabel()}${TL.who ? " by " + short(TL.who) : ""} on this video.`); return }
+  // step from the last action we jumped to while the film is still near it, otherwise from where the film is
+  const here = now() + S.leadIn;
+  const base = TL.lastT != null && Math.abs(here - TL.lastT) < S.leadIn + 15 ? TL.lastT : here;
+  const p = dir > 0 ? plays.find(x => x.t > base + 0.5) : plays.slice().reverse().find(x => x.t < base - 0.5);
+  if (p) { TL.lastT = p.t; jump(p); tlFlash(p.id); const i = plays.indexOf(p) + 1; toast(`${fmtT(p.t)} · ${i} of ${plays.length} ${tlActLabel()}`) }
+  else toast(dir > 0 ? `That's the last of the ${tlActLabel()} on this video.` : `That's the first of the ${tlActLabel()} on this video.`);
 }
+// right-click edit: change the player, the action, the squad or the time, or delete the action; the play-by-play and totals follow
+function tlCloseMenu() { const m = $("tlMenu"); if (m) m.remove(); TL.ed = null }
+function tlOpenMenu(ev, mk) {
+  tlCloseMenu();
+  const s = cur(); const p = tlFindPlay(mk.dataset.tlplay); if (!s || !p) return;
+  if (typeof viewOnly === "function" && viewOnly()) { toast("This is a shared view. Open your own copy to edit plays."); return }
+  const ix = +mk.dataset.i; const it = p.items[ix]; if (!it) return;
+  TL.ed = { id: p.id, ix, t: p.t, del: false };
+  const names = S.roster.map(r => r.name).filter(Boolean); if (it.p && !names.includes(it.p)) names.unshift(it.p);
+  const codes = Object.keys(KNAME);
+  const scrim = s.type === "Scrimmage";
+  const m = document.createElement("div"); m.className = "tledit"; m.id = "tlMenu";
+  m.innerHTML = `<h4>Edit action</h4><span class="small">“${esc(p.text)}”</span>
+    <div class="field"><label class="label" for="tmP">Player</label><select id="tmP"><option value="">No player</option>${names.map(n => `<option ${n === it.p ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+    <div class="field"><label class="label" for="tmK">Action</label><select id="tmK">${codes.map(c => `<option value="${c}" ${c === it.k ? "selected" : ""}>${esc(KNAME[c])}</option>`).join("")}</select></div>
+    ${scrim ? `<div class="field"><label class="label" for="tmQ">Squad (this player, this session)</label><select id="tmQ"><option value="">Not set</option>${S.squads.map(q => `<option ${q === ((s.squadOf || {})[it.p] || p.squad) ? "selected" : ""}>${esc(q)}</option>`).join("")}</select></div>` : ""}
+    <div class="field"><span class="label">Time</span><div class="row"><button class="ib" data-tm="-1">−1s</button><span class="tmT" id="tmT">${fmtT(p.t)}</span><button class="ib" data-tm="1">+1s</button><button class="ib" data-tm="now" title="Use where the film is now">Use film time</button></div></div>
+    <div class="row between"><div class="row"><button class="btn primary" data-tm="save">Save</button><button class="btn ghost" data-tm="cancel">Cancel</button></div><button class="btn danger" data-tm="del" id="tmDel">Delete</button></div>
+    <button class="btn ghost" data-tm="text" style="justify-content:flex-start">Edit the whole call as text…</button>`;
+  document.body.appendChild(m);
+  const x = Math.min(ev.clientX + 4, window.innerWidth - m.offsetWidth - 8), y = Math.min(ev.clientY + 4, window.innerHeight - m.offsetHeight - 8);
+  m.style.left = Math.max(8, x) + "px"; m.style.top = Math.max(8, y) + "px";
+  // the squad box follows the chosen player; it is only saved when the coach changes it
+  if (scrim) {
+    const sqOf = n => (n && (s.squadOf || {})[n]) || "";
+    $("tmQ").value = sqOf(it.p) || p.squad || "";
+    $("tmP").addEventListener("change", () => { $("tmQ").value = sqOf($("tmP").value); TL.ed.sqDirty = false });
+    $("tmQ").addEventListener("change", () => { TL.ed.sqDirty = true });
+  }
+  m.addEventListener("click", e => {
+    const b = e.target.closest("[data-tm]"); if (!b || !TL.ed) return;
+    const a = b.dataset.tm;
+    if (a === "-1" || a === "1") { TL.ed.t = Math.max(0, TL.ed.t + +a); $("tmT").textContent = fmtT(TL.ed.t) }
+    else if (a === "now") { TL.ed.t = Math.round(now()); $("tmT").textContent = fmtT(TL.ed.t) }
+    else if (a === "cancel") tlCloseMenu();
+    else if (a === "text") { editing = p.id; tlCloseMenu(); if (document.body.classList.contains("fs")) { try { document.exitFullscreen() } catch (x) {} } renderPBP(); setTimeout(() => { const e2 = $("editIn"); if (e2) e2.scrollIntoView({ block: "center" }) }, 60) }
+    else if (a === "del") {
+      if (!TL.ed.del) { TL.ed.del = true; b.textContent = "Confirm delete"; b.classList.add("armed"); return }
+      p.items.splice(ix, 1);
+      if (!p.items.length) s.plays = s.plays.filter(q => q.id !== p.id); else p.tlEdited = true;
+      tlCloseMenu(); save(); renderPBP(); renderTally(); toast("Action deleted from the play-by-play.");
+    }
+    else if (a === "save") {
+      const np = $("tmP").value || null, nk = $("tmK").value, nq = scrim ? $("tmQ").value : "";
+      const was = (it.p ? short(it.p) + " " : "") + KNAME[it.k];
+      const next = Object.assign({}, it, { k: nk, p: np });
+      if (!/^[23][MX]$/.test(nk)) delete next.tier;
+      if (nk !== "TO") { delete next.toType; delete next.ball }
+      p.items[ix] = next;
+      if (scrim && np && nq && TL.ed.sqDirty) { s.squadOf = s.squadOf || {}; s.squadOf[np] = nq }
+      if (TL.ed.t !== p.t) p.t = TL.ed.t;
+      p.tlEdited = true;
+      tlCloseMenu(); save(); renderPBP(); renderTally();
+      toast(`Updated: ${was} → ${(np ? short(np) + " " : "") + KNAME[nk]}`);
+    }
+  });
+}
+
 function tlFlash(id) {
   setTimeout(() => {
     const row = document.querySelector(`#pbp [data-id="${id}"]`); const pl = row && row.closest(".play"); if (!pl) return;
@@ -2201,7 +2320,7 @@ function tlFlash(id) {
   const tip = document.createElement("div"); tip.className = "tltip"; tip.hidden = true; document.body.appendChild(tip);
   const grid = $("tlGrid");
   grid.addEventListener("mousemove", e => {
-    const m = e.target.closest(".tlm"); if (!m) { tip.hidden = true; return }
+    const m = e.target.closest(".tlm"); if (!m || $("tlMenu")) { tip.hidden = true; return }
     const p = tlFindPlay(m.dataset.tlplay); if (!p) { tip.hidden = true; return }
     tip.innerHTML = `<b>${fmtT(p.t)}${p.period ? " · " + esc(PLAB[p.period] || p.period) : ""}</b><div class="row" style="gap:4px">${p.items.map(x => itemTag(x)).join("")}</div><span class="small">“${esc(p.text)}”</span>`;
     tip.hidden = false;
@@ -2225,17 +2344,25 @@ function tlFlash(id) {
     seekTo(tlTimeAt(e.clientX, r)); updateTimeline(true);
   });
   const end = () => { TL.drag = false }; grid.addEventListener("pointerup", end); grid.addEventListener("pointercancel", end);
-  $("tlWho").addEventListener("change", e => { TL.who = e.target.value; renderTimeline() });
+  $("tlWho").addEventListener("change", e => { TL.who = e.target.value; TL.lastT = null; renderTimeline() });
+  $("tlAct").addEventListener("change", e => { TL.act = e.target.value; TL.lastT = null; renderTimeline() });
+  grid.addEventListener("contextmenu", e => { const m = e.target.closest(".tlm"); if (!m) return; e.preventDefault(); tip.hidden = true; tlOpenMenu(e, m) });
+  document.addEventListener("pointerdown", e => { const m = $("tlMenu"); if (m && !m.contains(e.target)) tlCloseMenu() }, true);
+  const tlShow = on => { S.tlOff = !on; $("tl").hidden = !on; const b = $("tlTog"); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "Timeline on" : "Timeline off"; if (on) renderTimeline() };
+  tlShow(!S.tlOff);
+  document.addEventListener("fullscreenchange", () => { document.body.classList.toggle("fs", !!document.fullscreenElement); tlCloseMenu(); setTimeout(() => renderTimeline(), 120) });
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-act]"); if (!b) return;
     if (b.dataset.act === "tl-zoom") { S.tlZoom = b.dataset.z === "all" ? "all" : +b.dataset.z; save(); renderTimeline() }
+    else if (b.dataset.act === "tl-toggle") { tlShow(!!S.tlOff); save() }
     else if (b.dataset.act === "tl-prev") tlStep(-1);
     else if (b.dataset.act === "tl-next") tlStep(1);
   });
   document.addEventListener("keydown", e => {
     const a = document.activeElement; if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
     if (view !== "call" || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key === ",") { e.preventDefault(); tlStep(-1) } else if (e.key === ".") { e.preventDefault(); tlStep(1) }
+    if (e.key === "Escape" && $("tlMenu")) { tlCloseMenu(); return }
+    if (e.key === ",") { e.preventDefault(); tlStep(-1) } else if (e.key === ".") { e.preventDefault(); tlStep(1) } else if (e.key === "t" || e.key === "T") { e.preventDefault(); tlShow(!!S.tlOff); save() }
   });
   window.addEventListener("resize", () => renderTimeline());
   setInterval(() => { if (view === "call") updateTimeline(false) }, 250);
